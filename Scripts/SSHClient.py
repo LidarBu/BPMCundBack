@@ -1,9 +1,8 @@
-import json
-import logging
+from pathlib import Path
 import paramiko
 from paramiko.ssh_exception import SSHException
 
-import Configuration
+from .Configuration import Configuration
 
 
 class SSHClient:
@@ -11,13 +10,10 @@ class SSHClient:
 
     def __init__(self):
         configuration = Configuration()
-        configuration.conf[""]
+        self.ssh = ' '
 
-        try:
-            private_key_path = configuration["PRIVATE_KEY_PATH"]
-            self.host_name = configuration["HOST_NAME"]
-        except Exception:
-            logging.warning("Missing Configuration")
+        private_key_path = configuration.conf["PRIVATE_KEY_PATH"]
+        self.host_name = configuration.conf["HOST_NAME"]
 
         self.private_key = paramiko.RSAKey.from_private_key_file(private_key_path)
         self.ssh = paramiko.SSHClient()
@@ -26,7 +22,6 @@ class SSHClient:
     def __connect(self):
         if self.connected:
             return False, "The Client Already Connected"
-
         else:
             try:
                 self.ssh.connect(hostname=self.host_name, pkey=self.private_key)
@@ -43,16 +38,23 @@ class SSHClient:
             self.connected = False
             return True, "Disconnect the client"
 
-    def execute_command(self, command):
+    def execute_command(self, command, **kwargs):
         self.__connect()
         ssh_stdin, ssh_stdout, ssh_stderr = self.ssh.exec_command(command)
+        ssh_stdout = ssh_stdout.readlines()
+        ssh_stderr = ssh_stderr.readlines()
         self.__disconnect()
-        return ssh_stdin, ssh_stdout, ssh_stderr
+        return ssh_stdout, ssh_stderr
 
-    def execute_script(self, path):
+    def execute_script(self, path, **kwargs):
         self.__connect()
         with open(path, "r") as file:
-            script = json.load(file)
+            script = file.read()
+        script = str(script).format(**kwargs)
+        print(script)
+
         ssh_stdin, ssh_stdout, ssh_stderr = self.ssh.exec_command(script)
+        ssh_stdout = ssh_stdout.readlines()
+        ssh_stderr = ssh_stderr.readlines()
         self.__disconnect()
-        return ssh_stdin, ssh_stdout, ssh_stderr
+        return ssh_stdout, ssh_stderr

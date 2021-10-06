@@ -1,0 +1,7 @@
+{
+  "USER": "ub-l",
+  "SERVER": "localhost",
+  "LOG_HOME": "/tmp/logs",
+  "PRIVATE_KEY_PATH": "/home/ub-l/.ssh/id_rsa",
+  "HOST_NAME": "localhost"
+}
