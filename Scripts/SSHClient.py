@@ -50,7 +50,8 @@ class SSHClient:
         self.__connect()
         with open(path, "r") as file:
             script = file.read()
-        script = str(script).format(**kwargs)
+        if kwargs is not None:
+            script = str(script).format(**kwargs)
         print(script)
 
         ssh_stdin, ssh_stdout, ssh_stderr = self.ssh.exec_command(script)
