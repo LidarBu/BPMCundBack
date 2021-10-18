@@ -3,6 +3,7 @@ from flask_cors import cross_origin, CORS
 
 from Scripts import LogBPM, StartBPM, StopBPM, PortBPM, StatusAll
 from http import HTTPStatus
+import json
 
 test = {"TEST_KEY": "TEST_VALUE"}
 
@@ -17,7 +18,11 @@ def get_test():
     json_res = {"data": [{"name": "BPM103", "port": 9009, "description": "from 1 to 3", "state": "WORKING"},
                          {"name": "BPM204", "port": 9009, "description": "from 2 to 4", "state": "NOT-WORKING"}],
                 "error": None}
-    return json_res, HTTPStatus.OK, {'Content-Type': 'application/json'}
+    path = 'C:\\Users\\Lidar\\conf.json'
+    with open(path, "r") as file:
+        jsonT = json.load(file)
+
+    return jsonT, HTTPStatus.OK, {'Content-Type': 'application/json'}
 
 
 @api.route('/getlogtest', methods=['GET'])
